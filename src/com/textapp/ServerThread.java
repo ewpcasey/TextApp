@@ -37,6 +37,7 @@ public class ServerThread extends AsyncTask<Void, Transmittable, Boolean>{
 	
 	@Override
 	protected Boolean doInBackground(Void... unused){
+		android.os.Debug.waitForDebugger();
 		try{
 			ServerSocket socket = new ServerSocket(port);
 //			socket.setSoTimeout(TIMEOUT_LENGTH);

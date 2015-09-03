@@ -94,27 +94,6 @@ public abstract class Transmittable
 	}
 	
 	
-	//A transmittable that contains a simple String object for text messaging.
-	public static final class Message extends Transmittable{
-		
-		private static final long serialVersionUID = 0L;
-		
-		public static final String TAG = "Transmittable.Message";
-		
-		private String message;
-		
-		public Message(String message){
-			super(TAG);
-			this.type = Type.MESSAGE;
-			this.message = message;
-		}
-		
-		public String getMessage(){
-			return message;
-		}
-	}
-	
-	
 	public static class ContactRequest extends Transmittable{
 		
 		private static final long serialVersionUID = 0L;
@@ -128,12 +107,14 @@ public abstract class Transmittable
 			super(TAG);
 			this.type = Type.CONTACT_REQUEST;
 			this.macAddress = macAddress;
+			requested = new ArrayList<String>();
 		}
 		
 		public ContactRequest(String macAddress, List<String> macList){
 			super(TAG);
 			this.type = Type.CONTACT_REQUEST;
 			this.macAddress = macAddress;
+			requested = new ArrayList<String>();
 			requestContacts(macList);
 		}
 
@@ -152,6 +133,27 @@ public abstract class Transmittable
 		
 		public String getLocalMacAddress(){
 			return macAddress;
+		}
+	}
+	
+	
+	//A transmittable that contains a simple String object for text messaging.
+	public static final class Message extends Transmittable{
+		
+		private static final long serialVersionUID = 0L;
+		
+		public static final String TAG = "Transmittable.Message";
+		
+		private String message;
+		
+		public Message(String message){
+			super(TAG);
+			this.type = Type.MESSAGE;
+			this.message = message;
+		}
+		
+		public String getMessage(){
+			return message;
 		}
 	}
 }

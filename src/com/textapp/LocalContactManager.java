@@ -33,7 +33,7 @@ public class LocalContactManager{
 		for(WifiP2pDevice device: deviceList){
 			macList.add(device.deviceAddress);
 		}
-		Transmittable.ContactRequest request = new Transmittable.ContactRequest(macAddress);
+		Transmittable.ContactRequest request = new Transmittable.ContactRequest(macAddress, macList);
 		new MessageTask(Constants.PORT_IN, groupOwnerAddress).executeOnExecutor(MessageTask.SERIAL_EXECUTOR, request);
 	}
 	
