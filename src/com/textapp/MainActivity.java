@@ -188,6 +188,9 @@ public class MainActivity extends Activity
 		if(!isGroupOwner){
 			lcm.requestContacts(devices);
 		}
+		else{
+			lcm.requestContactsAsGroupOwner(devices, groupOwner);
+		}
 	}
 	
 	
