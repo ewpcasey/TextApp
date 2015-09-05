@@ -34,6 +34,7 @@ public class MainActivity extends Activity
 	private boolean isGroupOwner = false;
 	
 	private String macAddress;
+	private boolean macFound = false;
 	
 	private WifiP2pManager wifiP2pManager;
 	private WifiManager wifiManager;
@@ -58,7 +59,7 @@ public class MainActivity extends Activity
 		
 		//Initialize WiFi Multicast
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		macAddress = wifiManager.getConnectionInfo().getMacAddress();
+//		macAddress = wifiManager.getConnectionInfo().getMacAddress();
 //		lock = wifiManager.createMulticastLock(TAG);
 //		lock.acquire();
 		
@@ -222,6 +223,19 @@ public class MainActivity extends Activity
 //				Log.i(TAG, "FAILED TO FIND MULTICAST HOST");
 //			}
 		}
+	}
+	
+	public String getMacAddress(){
+		return macAddress;
+	}
+	
+	public boolean macFound(){
+		return macFound;
+	}
+	
+	public void macDetector(String mac){
+		macAddress = mac;
+		macFound = true;
 	}
 	
 	public LocalContactManager getLocalContactManager(){

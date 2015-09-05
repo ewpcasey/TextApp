@@ -26,6 +26,7 @@ public class TextAppBroadcastReceiver extends BroadcastReceiver /*implements Wif
 		public void removeGroupOwner();
 		public void enableP2P(InetAddress groupOwnerAddress, Collection<WifiP2pDevice> deviceList);
 		public void disableP2P();
+		public void macDetector(String mac);
 	}
 
 	private static final String TAG = "TextAppBroadcastReceiver";
@@ -51,7 +52,8 @@ public class TextAppBroadcastReceiver extends BroadcastReceiver /*implements Wif
 		if(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)){
 			//WiFi P2P changed action--get current state  (enabled or disabled)
 			int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
-	        if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
+
+			if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
 	        	//WiFi P2P is enabled
 	        	if(Constants.VERBOSE) Log.v(TAG, "WIFI P2P ENABLED");
 //	        	((P2PEnabledListener) mActivity).enableP2P();
@@ -125,6 +127,11 @@ public class TextAppBroadcastReceiver extends BroadcastReceiver /*implements Wif
 					}
 				}
 			});
+		}
+		if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
+			WifiP2pDevice device = (WifiP2pDevice) intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+
+	        mActivity.macDetector(device.deviceAddress);
 		}
 //		if(Constants.SEND_MESSAGE.equals(action)){
 //			try{
