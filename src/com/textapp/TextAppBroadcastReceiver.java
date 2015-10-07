@@ -111,6 +111,13 @@ public class TextAppBroadcastReceiver extends BroadcastReceiver /*implements Wif
 				@Override
 				public void onConnectionInfoAvailable(final WifiP2pInfo info){
 					final InetAddress groupOwnerAddress = info.groupOwnerAddress;
+					if(info.groupFormed){
+						
+					}
+					else{
+						mActivity.removeGroupOwner();
+						mActivity.disableP2P();
+					}
 					if(info.isGroupOwner && info.groupFormed){
 						mActivity.makeGroupOwner(groupOwnerAddress);
 					}

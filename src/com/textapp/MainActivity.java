@@ -131,12 +131,7 @@ public class MainActivity extends Activity
 		
 		if(type == Transmittable.Type.MESSAGE){
 			Transmittable.Message message = (Transmittable.Message) transmittable;
-			TextView textView = new TextView(this);
-			textView.setText(message.getMessage());
-			textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-			LinearLayout layout = (LinearLayout) findViewById(R.id.messageDisplay_layout);
-			layout.addView(textView);
-			layout.postInvalidate();
+			updateMessageView(message.getMessage());
 		}
 		
 		if(type == Transmittable.Type.CONTACT){
@@ -185,10 +180,18 @@ public class MainActivity extends Activity
 			serverThread.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			p2pEnabled = true;
 		}
-		//otherwise, send MAC address to groupowner, request neighbors' contact info
+		//If you are a client, wait 1sec to allow group owner time to establish server thread.
+		//Request contacts from the group owner.
 		if(!isGroupOwner){
+			try{
+				Thread.sleep(1000);
+			}
+			catch(InterruptedException e){
+				e.printStackTrace();
+			}
 			lcm.requestContacts(devices);
 		}
+		//Otherwise, if you are the group owner, request other contact info from your local data.
 		else{
 			lcm.requestContactsAsGroupOwner(devices, groupOwner);
 		}
@@ -197,6 +200,7 @@ public class MainActivity extends Activity
 	
 	@Override
 	public void disableP2P(){
+		isGroupOwner = false;
 		groupOwner = null;
 		lcm = null;
 		p2pEnabled = false;
@@ -223,6 +227,15 @@ public class MainActivity extends Activity
 //				Log.i(TAG, "FAILED TO FIND MULTICAST HOST");
 //			}
 		}
+	}
+	
+	public void updateMessageView(String message){
+		TextView textView = new TextView(this);
+		textView.setText(message);
+		textView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		LinearLayout layout = (LinearLayout) findViewById(R.id.messageDisplay_layout);
+		layout.addView(textView);
+		layout.postInvalidate();
 	}
 	
 	public String getMacAddress(){

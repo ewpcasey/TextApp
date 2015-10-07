@@ -32,20 +32,20 @@ public class GroupOwner {
 		Transmittable.Contact newContact = new Transmittable.Contact(mac, ip);
 		
 		//Initialize contact request list
-		List<Transmittable.Contact> toSend = new ArrayList<Transmittable.Contact>();
+		Transmittable.ContactList toSend = new Transmittable.ContactList();
 		
 		//For every address we find that has been requested, add a new transmittable
 		//contact to the list we're going to send out.
 		for(String address: macAddresses){
 			InetAddress contact = getContact(address);
 			if(contact != null){
-				toSend.add(new Transmittable.Contact(mac, ip));
+				toSend.addContact(new Transmittable.Contact(mac, ip));
 			}
 		}
 		
 		//For every relevant contact in our database, send the new contact's info out to them.
 		//If one of those addresses is the group owner's, add it to the local contact manager instead.
-		for(Transmittable.Contact contact: toSend){
+		for(Transmittable.Contact contact: toSend.pullContacts()){
 			if(contact.getMacAddress().equals(thisAddress)){
 				lcm.addContact(mac, ip);
 			}
@@ -55,12 +55,8 @@ public class GroupOwner {
 			}
 		}
 		
-		//Create an array from the matching contacts list
-		Transmittable.Contact[] toSendArray = new Transmittable.Contact[toSend.size()];
-		toSend.toArray(toSendArray);
-		
-		//Send the matching contacts to the new member
-		new MessageTask(Constants.PORT_IN, ip).executeOnExecutor(MessageTask.SERIAL_EXECUTOR, toSendArray);
+		//Send the contact list to the new member
+		new MessageTask(Constants.PORT_IN, ip).executeOnExecutor(MessageTask.SERIAL_EXECUTOR, toSend);
 	}
 	
 	public void addContact(String mac, InetAddress ip){

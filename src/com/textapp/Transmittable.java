@@ -3,6 +3,7 @@ package com.textapp;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public abstract class Transmittable
@@ -11,6 +12,15 @@ public abstract class Transmittable
 	/*This class acts as a superclass and as a container for all the various transmittable types we want to use.
 	On its own, it contains the address this transmittable was sent from, if applicable, the set of possible types,
 	and a record of what type is currently being used. It is serializable so that it may be sent over a data stream.*/
+	
+	
+	//Delineate the possible types that a Transmittable can act as
+	public enum Type{
+		
+		CONTACT, MESSAGE, CONTACT_REQUEST, CONTACT_LIST;
+		
+	}
+	
 	
 	private static final long serialVersionUID = 0L;
 	
@@ -34,14 +44,6 @@ public abstract class Transmittable
 	
 	public InetAddress getSentAddress(){
 		return sentAddress;
-	}
-	
-	
-	//Delineate the possible types that a Transmittable can act as
-	public enum Type{
-		
-		CONTACT, MESSAGE, CONTACT_REQUEST;
-		
 	}
 	
 	
@@ -94,6 +96,8 @@ public abstract class Transmittable
 	}
 	
 	
+	//Contains a series of MAC addresses for which a group member needs corresponding IP addresses.
+	//Sent from group member to group owner to request these corresponding pairs.
 	public static class ContactRequest extends Transmittable{
 		
 		private static final long serialVersionUID = 0L;
@@ -133,6 +137,44 @@ public abstract class Transmittable
 		
 		public String getLocalMacAddress(){
 			return macAddress;
+		}
+	}
+	
+	
+	//Group owner's response to a ContactRequest. Contains the matching MAC/IP address
+	//pairs that a group member requested.
+	public static final class ContactList extends Transmittable{
+		
+		private static final long serialVersionUID = 0L;
+		
+		public static final String TAG = "Transmittable.ContactGroup";
+		
+		public ArrayList<Transmittable.Contact> contacts;
+		
+		public ContactList(){
+			super(TAG);
+			this.type = Type.CONTACT_LIST;
+			contacts = new ArrayList<Transmittable.Contact>();
+		}
+		
+		public ContactList(Collection<Transmittable.Contact> contacts){
+			super(TAG);
+			this.type = Type.CONTACT_LIST;
+			this.contacts = new ArrayList<Transmittable.Contact>();
+			this.contacts.addAll(contacts);
+		}
+		
+		
+		public void addContact(Transmittable.Contact contact){
+			contacts.add(contact);
+		}
+		
+		public void addContacts(Collection<Transmittable.Contact> contacts){
+			this.contacts.addAll(contacts);
+		}
+		
+		public ArrayList<Transmittable.Contact> pullContacts(){
+			return contacts;
 		}
 	}
 	
