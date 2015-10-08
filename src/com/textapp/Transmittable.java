@@ -17,7 +17,7 @@ public abstract class Transmittable
 	//Delineate the possible types that a Transmittable can act as
 	public enum Type{
 		
-		CONTACT, MESSAGE, CONTACT_REQUEST, CONTACT_LIST;
+		CONTACT, MESSAGE, CONTACT_REQUEST, CONTACT_LIST, MUSIC_FEED;
 		
 	}
 	
@@ -149,7 +149,7 @@ public abstract class Transmittable
 		
 		public static final String TAG = "Transmittable.ContactGroup";
 		
-		public ArrayList<Transmittable.Contact> contacts;
+		private ArrayList<Transmittable.Contact> contacts;
 		
 		public ContactList(){
 			super(TAG);
@@ -179,6 +179,33 @@ public abstract class Transmittable
 	}
 	
 	
+	public static final class MusicFeed extends Transmittable{
+		
+		private static final long serialVersionUID = 0L;
+		
+		public static final String TAG = "Transmittable.MusicFeed";
+		
+		private String feed;
+		private String deviceName;
+		
+		
+		public MusicFeed(String feed, String deviceName){
+			super(TAG);
+			this.type = Type.MUSIC_FEED;
+			this.feed = feed;
+			this.deviceName = deviceName;
+		}
+		
+		public String getFeed(){
+			return feed;
+		}
+		
+		public String getDeviceName(){
+			return deviceName;
+		}
+	}
+	
+	
 	//A transmittable that contains a simple String object for text messaging.
 	public static final class Message extends Transmittable{
 		
@@ -187,6 +214,7 @@ public abstract class Transmittable
 		public static final String TAG = "Transmittable.Message";
 		
 		private String message;
+		
 		
 		public Message(String message){
 			super(TAG);

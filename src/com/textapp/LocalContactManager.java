@@ -34,7 +34,7 @@ public class LocalContactManager{
 			macList.add(device.deviceAddress);
 		}
 		Transmittable.ContactRequest request = new Transmittable.ContactRequest(macAddress, macList);
-		new MessageTask(Constants.PORT_IN, groupOwnerAddress).executeOnExecutor(MessageTask.SERIAL_EXECUTOR, request);
+		new MessageTask(Constants.PORT_IN, groupOwnerAddress).executeOnExecutor(MessageTask.THREAD_POOL_EXECUTOR, request);
 	}
 	
 	public void requestContactsAsGroupOwner(Collection<WifiP2pDevice> deviceList, GroupOwner groupOwner){
@@ -45,10 +45,16 @@ public class LocalContactManager{
 		}
 	}
 	
+	public void updateMusicFeed(Transmittable.MusicFeed feed){
+		for (InetAddress contact: contacts.values()){
+			new MessageTask(Constants.PORT_IN, contact).executeOnExecutor(MessageTask.THREAD_POOL_EXECUTOR, feed);
+		}
+	}
+	
 	public void messageAll(String message){
 		Transmittable toSend = new Transmittable.Message(message);
 		for(InetAddress contact: contacts.values()){
-			new MessageTask(Constants.PORT_IN, contact).executeOnExecutor(MessageTask.SERIAL_EXECUTOR, toSend);
+			new MessageTask(Constants.PORT_IN, contact).executeOnExecutor(MessageTask.THREAD_POOL_EXECUTOR, toSend);
 		}
 	}
 	

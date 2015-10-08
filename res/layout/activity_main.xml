@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <Button
+<!-- 	<Button
         android:id="@+id/button_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,13 +23,14 @@
 		android:layout_toStartOf="@id/button_send"
         android:layout_toLeftOf="@id/button_send"
         android:hint="@string/message_hint" />
+-->
 
     <fragment
         android:name="com.textapp.MessageFragment"
         android:id="@+id/message_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@id/button_send"
+        android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

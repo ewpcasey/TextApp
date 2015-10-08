@@ -1,24 +1,27 @@
 package com.textapp;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Collection;
+
+import org.farng.mp3.MP3File;
+import org.farng.mp3.TagException;
+import org.farng.mp3.id3.AbstractID3v2;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
-import android.net.wifi.p2p.WifiP2pManager.GroupInfoListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -35,6 +38,9 @@ public class MainActivity extends Activity
 	
 	private String macAddress;
 	private boolean macFound = false;
+	
+	private String deviceName;
+	private String currentSong;
 	
 	private WifiP2pManager wifiP2pManager;
 	private WifiManager wifiManager;
@@ -84,6 +90,8 @@ public class MainActivity extends Activity
 	    mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
 	    mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
 	    mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+	    
+	    initializeView();
 	}
 	
 	
@@ -151,6 +159,37 @@ public class MainActivity extends Activity
 						request.getSentAddress(), request.pullContacts(), lcm);
 			}
 		}
+		
+		if(type == Transmittable.Type.CONTACT_LIST){
+			Transmittable.ContactList contactList = (Transmittable.ContactList) transmittable;
+			for (Transmittable.Contact contact: contactList.pullContacts()){
+				lcm.addContact(contact.getMacAddress(), contact.getInetAddress());
+			}
+			lcm.updateMusicFeed(new Transmittable.MusicFeed(currentSong, deviceName));
+		}
+		
+		if(type == Transmittable.Type.MUSIC_FEED){
+			Transmittable.MusicFeed feed = (Transmittable.MusicFeed) transmittable;
+			LinearLayout newPeer = new LinearLayout(this);
+			newPeer.setOrientation(LinearLayout.VERTICAL);
+			newPeer.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v){
+					//Start new activity!
+					Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+					startActivity(intent);
+				}
+			});
+			TextView deviceName = new TextView(this);
+			deviceName.setText(feed.getDeviceName());
+			newPeer.addView(deviceName);
+			TextView thisDevicePlaying = new TextView(this);
+			thisDevicePlaying.setText(feed.getFeed());
+			newPeer.addView(thisDevicePlaying);
+			LinearLayout layout = (LinearLayout) findViewById(R.id.messageDisplay_layout);
+			layout.addView(newPeer);
+			layout.postInvalidate();
+		}
 	}
 	
 	@Override
@@ -215,7 +254,7 @@ public class MainActivity extends Activity
 //		return mcReceiver;
 //	}
 	
-	public void sendMessage(View view){
+/*	public void sendMessage(View view){
 		if(p2pEnabled){
 			String message = ((EditText) findViewById(R.id.edit_message)).getText().toString();
 			lcm.messageAll(message);
@@ -228,6 +267,47 @@ public class MainActivity extends Activity
 //			}
 		}
 	}
+	*/
+	
+	//Dummy method for creating media listing for your own device
+	public void initializeView(){
+		String songName = "";
+		try{
+			MP3File mp3 = new MP3File("/storage/emulated/0/Music/Death Grips - Get Got.mp3");
+			AbstractID3v2 tag = mp3.getID3v2Tag();
+			songName = tag.getSongTitle();
+		}
+		catch(TagException e){
+			
+		}
+		catch(FileNotFoundException e){
+			Log.e("File I/O activity", "File not found: " + e.toString());
+			e.printStackTrace();
+		}
+		catch(IOException e){
+			Log.e("File I/O activity", "Can not read file: " + e.toString());
+			e.printStackTrace();
+		}
+		LinearLayout newPeer = new LinearLayout(this);
+		newPeer.setOrientation(LinearLayout.VERTICAL);
+		newPeer.setOnClickListener(new View.OnClickListener(){
+			@Override
+			public void onClick(View v){
+				//Start new activity!
+				Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+				startActivity(intent);
+			}
+		});
+		TextView thisDeviceName = new TextView(this);
+		thisDeviceName.setText("Bearnaise");
+		newPeer.addView(thisDeviceName);
+		TextView thisDevicePlaying = new TextView(this);
+		thisDevicePlaying.setText(songName);
+		newPeer.addView(thisDevicePlaying);
+		LinearLayout layout = (LinearLayout) findViewById(R.id.messageDisplay_layout);
+		layout.addView(newPeer);
+		layout.postInvalidate();
+	}
 	
 	public void updateMessageView(String message){
 		TextView textView = new TextView(this);
@@ -236,6 +316,10 @@ public class MainActivity extends Activity
 		LinearLayout layout = (LinearLayout) findViewById(R.id.messageDisplay_layout);
 		layout.addView(textView);
 		layout.postInvalidate();
+	}
+	
+	public void setDeviceName(String deviceName){
+		this.deviceName = deviceName;
 	}
 	
 	public String getMacAddress(){

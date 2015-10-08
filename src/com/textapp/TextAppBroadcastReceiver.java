@@ -138,6 +138,7 @@ public class TextAppBroadcastReceiver extends BroadcastReceiver /*implements Wif
 		if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
 			WifiP2pDevice device = (WifiP2pDevice) intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
 
+			mActivity.setDeviceName(device.deviceName);
 	        mActivity.macDetector(device.deviceAddress);
 		}
 //		if(Constants.SEND_MESSAGE.equals(action)){
